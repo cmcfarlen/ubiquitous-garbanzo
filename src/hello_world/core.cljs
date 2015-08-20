@@ -1,10 +1,9 @@
 (ns hello-world.core
-  (:require [screeps.core :as s]
-            [screeps.game :as game]
+  (:require [screeps.game :as game]
             [screeps.creep :as creep]
+            [screeps.spawn :as spawn]
             [screeps.position :as pos]
-            [screeps.memory :as m]
-            ))
+            [screeps.memory :as m]))
 
 (defn test-game
   []
@@ -53,18 +52,15 @@
 #_(test-position)
 #_(test-memory)
 
-(let [g (s/Game. js/Game)
-      cnt (s/creep-count (s/creeps g))]
+(let [cnt (count (game/creeps))]
   (.log js/console (str "creeps --: " cnt))
-  (.log js/console (mapv #(.-name %) (vals (js->clj (s/rooms g)))))
+  #_(.log js/console (mapv #(.-name %) (vals (js->clj (s/rooms g)))))
   (when (< cnt 5)
     (.log js/console "need more creeps!")
-    (let [status (s/create-creep (s/spawns g "Spawn1") [js/WORK js/CARRY js/MOVE] nil)]
+    (let [status (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/MOVE])]
       (.log js/console (str "spawn returned: " status))))
   (.log js/console "moving creeps!!!!")
-  (doseq [c (->>
-             (js-keys (s/creeps g))
-             (map #(s/creeps g %)))]
-    (s/move c (rand-nth (keys s/kw->dir))))
+  (doseq [c (game/creeps)]
+    (creep/move c (rand-nth [js/TOP js/BOTTOM js/LEFT js/RIGHT js/TOP_LEFT js/TOP_RIGHT js/BOTTOM_LEFT js/BOTTOM_RIGHT])))
   )
 
