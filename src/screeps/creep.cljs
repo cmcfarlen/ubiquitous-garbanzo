@@ -17,3 +17,31 @@
   [c target]
   (.moveTo c target))
 
+(defn harvest
+  [c t]
+  (.harvest c t))
+
+(defn energy
+  [c]
+  (aget c "carry" "energy"))
+
+(defn transfer-energy
+  [c t & [amt]]
+  (.transferEnergy c t amt))
+
+(defn upgrade-controller
+  [c ctrl]
+  (.upgradeController c ctrl))
+
+(defn claim-controller
+  [c ctrl]
+  (.claimController c ctrl))
+
+(defn memory
+  [c]
+  (js->clj (.-memory c) :keywordize-keys true))
+
+(defn memory!
+  [c m]
+  (aset js/Memory "creeps" (name c) (clj->js m)))
+

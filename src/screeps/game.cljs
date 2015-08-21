@@ -22,6 +22,14 @@
   ([n]
    (aget (.-spawns js/Game) n)))
 
+(defn rooms
+  ([]
+   (-> (.-rooms js/Game)
+       js->clj
+       vals))
+  ([n]
+   (aget (.-rooms js/Game) n)))
+
 (defn object
   [id]
   (.getObjectById js/Game id))
