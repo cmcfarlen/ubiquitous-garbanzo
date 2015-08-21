@@ -65,29 +65,40 @@
 (defn collect-energy
   [creep]
   (let [sim-room (game/rooms "sim")
-        source (first (room/find sim-room js/FIND_SOURCES))
+        sources (room/find sim-room js/FIND_SOURCES_ACTIVE)
+        source (nth sources (mod (.substring (creep/id creep) 2) (count sources)))
         ctrlr (room/controller sim-room)
+        const-site (first (room/find sim-room js/FIND_CONSTRUCTION_SITES))
         m (creep/memory creep)
         sp1 (game/spawns "Spawn1")]
     (if (:dump m)
       (do
-       (if (< (.-energy sp1) 300)
-         (if (pos/next-to? creep sp1)
-           (creep/transfer-energy creep sp1)
-           (creep/move-to creep sp1))
-         (if (pos/next-to? creep ctrlr)
-           (do
-            (creep/claim-controller creep ctrlr)
-            (creep/upgrade-controller creep ctrlr))
-           (creep/move-to creep ctrlr)))
+       (cond
+        (< (.-energy sp1) 300)
+        (if (pos/next-to? creep sp1)
+          (creep/transfer-energy creep sp1)
+          (creep/move-to creep sp1)) 
+
+        const-site
+        (if (pos/next-to? creep const-site)
+          (creep/build creep const-site)
+          (creep/move-to creep const-site))
+
+        :else
+        (if (pos/next-to? creep ctrlr)
+          (do
+           (creep/claim-controller creep ctrlr)
+           (creep/upgrade-controller creep ctrlr))
+          (creep/move-to creep ctrlr)))
        (if (= (creep/energy creep) 0)
          (creep/memory! creep (assoc m :dump false))))
       (if (= (creep/energy creep) 50)
         (creep/memory! creep (assoc m :dump true))
         (if (pos/next-to? creep source)
           (creep/harvest creep source)
-          (creep/move-to creep source))))
-    ))
+          (creep/move-to creep source))))))
+
+
 
 #_(test-game)
 
@@ -99,13 +110,15 @@
 #_(test-room)
 
 (let [cnt (count (game/creeps))]
-  #_(.log js/console (str "creeps --: " cnt))
+  (.log js/console (str "creeps --: " cnt))
   #_(.log js/console (mapv #(.-name %) (vals (js->clj (s/rooms g)))))
-  (when (< cnt 5)
+  (when (< cnt 10)
     (.log js/console "need more creeps!")
     (let [status (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/MOVE])]
       (.log js/console (str "spawn returned: " status)))))
 
 (doseq [c (game/creeps)]
   (collect-energy c))
+
+#_(.log js/console (str "" (game/used-cpu) "/" (game/cpu-limit)))
 

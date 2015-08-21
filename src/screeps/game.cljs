@@ -38,3 +38,7 @@
   []
   (.getUsedCpu js/Game))
 
+(defn cpu-limit
+  []
+  (.-cpuLimit js/Game))
+

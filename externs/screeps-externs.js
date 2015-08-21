@@ -14,6 +14,7 @@ Game.creeps.transferEnergy = function (target, amt) {};
 Game.creeps.upgradeController = function (target) {};
 Game.creeps.claimController = function (target) {};
 Game.creeps.harvest = function (target) {};
+Game.creeps.build = function (target) {};
 Game.creeps.name;
 Game.creeps.body;
 Game.creeps.id;

@@ -1,6 +1,10 @@
 (ns screeps.creep
   (:refer-clojure :exclude [name]))
 
+(defn id
+  [c]
+  (.-id c))
+
 (defn body
   [c]
   (js->clj (.-body c)))
@@ -16,6 +20,10 @@
 (defn move-to
   [c target]
   (.moveTo c target))
+
+(defn build
+  [c t]
+  (.build c t))
 
 (defn harvest
   [c t]
