@@ -47,6 +47,33 @@ Game.time;
 
 Game.structures = {};
 
+var Structure = {}
+Structure.my;
+Structure.hits;
+Structure.maxHits;
+Structure.id;
+Structure.owner;
+Structure.pos;
+Structure.room;
+Structure.structureType;
+Structure.destory = function () {};
+
+Structure.energy;
+Structure.energyCapacity;
+Structure.transferEnergy = function (tgt, amt) {};
+
+Structure.cooldown;
+
+Structure.level;
+Structure.progress;
+Structure.progressTotal;
+Structure.ticksToDowngrade;
+
+Structure.ticksToDegrade;
+Structure.ticksToLive;
+Structure.store;
+Structure.storeCapacity;
+
 var RoomPosition = function (x, y, room) {};
 
 RoomPosition.roomName;
@@ -63,5 +90,6 @@ var Memory = {};
 
 var Source = {};
 Source.pos
+
 
 

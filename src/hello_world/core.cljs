@@ -4,6 +4,7 @@
             [screeps.room :as room]
             [screeps.spawn :as spawn]
             [screeps.position :as pos]
+            [screeps.structure :as structure]
             [screeps.memory :as m]))
 
 (defn test-game
@@ -62,6 +63,12 @@
     )
   )
 
+(defn perform-at
+  [creep tgt f]
+  (if (pos/next-to? creep tgt)
+    (f creep tgt)
+    (creep/move-to creep tgt)))
+
 (defn collect-energy
   [creep]
   (let [sim-room (game/rooms "sim")
@@ -69,30 +76,35 @@
         source (nth sources (mod (.substring (creep/id creep) 2) (count sources)))
         ctrlr (room/controller sim-room)
         const-site (first (room/find sim-room js/FIND_CONSTRUCTION_SITES))
+        empty-extension (first (room/find sim-room js/FIND_MY_STRUCTURES #(and
+                                                                             (= (structure/type %) js/STRUCTURE_EXTENSION)
+                                                                             (< (structure/energy %) (structure/energy-capacity %)))))
         m (creep/memory creep)
         sp1 (game/spawns "Spawn1")]
+
     (if (:dump m)
       (do
        (cond
-        (< (.-energy sp1) 300)
-        (if (pos/next-to? creep sp1)
-          (creep/transfer-energy creep sp1)
-          (creep/move-to creep sp1)) 
+        (not (structure/mine? ctrlr))
+        (perform-at creep ctrlr creep/claim-controller)
+
+        (= 1 (structure/level ctrlr))
+        (perform-at creep ctrlr creep/upgrade-controller)
 
         const-site
-        (if (pos/next-to? creep const-site)
-          (creep/build creep const-site)
-          (creep/move-to creep const-site))
+        (perform-at creep const-site creep/build)
+
+        (< (.-energy sp1) 300)
+        (perform-at creep sp1 creep/transfer-energy)
+
+        empty-extension
+        (perform-at creep empty-extension creep/transfer-energy)
 
         :else
-        (if (pos/next-to? creep ctrlr)
-          (do
-           (creep/claim-controller creep ctrlr)
-           (creep/upgrade-controller creep ctrlr))
-          (creep/move-to creep ctrlr)))
+        (perform-at creep ctrlr creep/upgrade-controller))
        (if (= (creep/energy creep) 0)
          (creep/memory! creep (assoc m :dump false))))
-      (if (= (creep/energy creep) 50)
+      (if (= (creep/energy creep) (creep/energy-capacity creep))
         (creep/memory! creep (assoc m :dump true))
         (if (pos/next-to? creep source)
           (creep/harvest creep source)
@@ -112,7 +124,16 @@
 (let [cnt (count (game/creeps))]
   (.log js/console (str "creeps --: " cnt))
   #_(.log js/console (mapv #(.-name %) (vals (js->clj (s/rooms g)))))
-  (when (< cnt 10)
+  (cond
+   (< cnt 5)
+   (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/MOVE])
+
+   (< cnt 20)
+   (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/CARRY js/MOVE js/MOVE])
+
+   (< cnt 30)
+   (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/WORK js/CARRY js/CARRY js/CARRY js/MOVE]))
+  #_(when (< cnt 20)
     (.log js/console "need more creeps!")
     (let [status (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/MOVE])]
       (.log js/console (str "spawn returned: " status)))))

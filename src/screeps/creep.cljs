@@ -33,6 +33,10 @@
   [c]
   (aget c "carry" "energy"))
 
+(defn energy-capacity
+  [c]
+  (aget c "carryCapacity"))
+
 (defn transfer-energy
   [c t & [amt]]
   (.transferEnergy c t amt))
