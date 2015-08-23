@@ -24,7 +24,6 @@
     {:output-to "release/wtf.js"
      :output-dir "release"
      :optimizations :advanced
-     :externs ["externs/screeps-externs.js"]
      :watch-fn deploy-build
      :verbose true})
   (println "... done. Elapsed" (/ (- (System/nanoTime) start) 1e9) "seconds"))
