@@ -85,7 +85,7 @@
     (if (:dump m)
       (do
        (cond
-        (not (structure/mine? ctrlr))
+        (and (not (nil? ctrlr)) (not (structure/mine? ctrlr)))
         (perform-at creep ctrlr creep/claim-controller)
 
         (= 1 (structure/level ctrlr))
@@ -121,7 +121,7 @@
 
 #_(test-room)
 
-(let [cnt (count (game/creeps))]
+#_(let [cnt (count (game/creeps))]
   (.log js/console (str "creeps --: " cnt))
   #_(.log js/console (mapv #(.-name %) (vals (js->clj (s/rooms g)))))
   (cond
@@ -138,7 +138,7 @@
     (let [status (spawn/create-creep (game/spawns "Spawn1") [js/WORK js/CARRY js/MOVE])]
       (.log js/console (str "spawn returned: " status)))))
 
-(doseq [c (game/creeps)]
+#_(doseq [c (game/creeps)]
   (collect-energy c))
 
 #_(.log js/console (str "" (game/used-cpu) "/" (game/cpu-limit)))
